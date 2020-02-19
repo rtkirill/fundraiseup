@@ -1,29 +1,12 @@
 # fundraiseup
 
 ## Project setup
+Create config.json in root with server port and MongoDB auth parameters.
+Then use commands:
 ```
 npm install
-```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
 npm run build
-```
 
-### Run your tests
+npm start
 ```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
