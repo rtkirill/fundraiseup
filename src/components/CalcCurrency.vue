@@ -40,7 +40,11 @@
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-lg btn-block btn-primary shadow-sm text-uppercase">Donate</button>
+                <button type="button" class="btn btn-lg btn-block btn-primary shadow-sm text-uppercase"
+                        @click.prevent="donate()"
+                >
+                    Donate
+                </button>
             </div>
         </div>
     </div>
@@ -48,10 +52,12 @@
 
 <script>
 	import {mapGetters} from 'vuex'
-    import {mapActions} from 'vuex'
+	import {mapActions} from 'vuex'
 	import {required, numeric, minValue} from 'vuelidate/lib/validators'
 
-    let beforeRate, curRate
+	const axios = require('axios');
+
+	let beforeRate, curRate
 
 	export default {
 		name: "CalcCurrency",
@@ -92,20 +98,38 @@
 			convertCurrency() {
 				let currency = this.currencies.find(currency => currency.code === this.currency_type)
 				this.currency_symbol = currency.symbol
-                let newSuggestion = this.suggestion
-                beforeRate = curRate
-                curRate = currency.rate
-                if(currency.rate === 1 && beforeRate) {
+				let newSuggestion = this.suggestion
+				beforeRate = curRate
+				curRate = currency.rate
+				if (currency.rate === 1 && beforeRate) {
 					newSuggestion /= beforeRate
-                } else if(beforeRate) {
+				} else if (beforeRate) {
 					newSuggestion = newSuggestion / beforeRate * currency.rate
-                } else {
+				} else {
 					newSuggestion *= currency.rate
-                }
+				}
 
-                this.suggestion = Math.round(newSuggestion);
+				this.suggestion = Math.round(newSuggestion);
 				this.makeConvertCurrency(this.currency_type);
-            }
+			},
+			donate() {
+				this.$v.$touch();
+				if (!this.$v.$invalid) {
+					axios.post('/donate', {
+						amount: this.suggestion,
+						currency: this.currency_type
+					})
+						.then(function (response) {
+							if(response.data.ok === true) {
+								alert("Thank you for your donation!")
+                            }
+							console.log(response.data);
+						})
+						.catch(function (error) {
+                            console.log(error);
+						})
+				}
+			}
 		},
 		filters: {
 			currencyFormat: function (value) {
