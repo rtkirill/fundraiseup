@@ -51,6 +51,8 @@
     import {mapActions} from 'vuex'
 	import {required, numeric, minValue} from 'vuelidate/lib/validators'
 
+    let beforeRate, curRate
+
 	export default {
 		name: "CalcCurrency",
 		data() {
@@ -90,6 +92,18 @@
 			convertCurrency() {
 				let currency = this.currencies.find(currency => currency.code === this.currency_type)
 				this.currency_symbol = currency.symbol
+                let newSuggestion = this.suggestion
+                beforeRate = curRate
+                curRate = currency.rate
+                if(currency.rate === 1 && beforeRate) {
+					newSuggestion /= beforeRate
+                } else if(beforeRate) {
+					newSuggestion = newSuggestion / beforeRate * currency.rate
+                } else {
+					newSuggestion *= currency.rate
+                }
+
+                this.suggestion = Math.round(newSuggestion);
 				this.makeConvertCurrency(this.currency_type);
             }
 		},
