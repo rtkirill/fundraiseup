@@ -16,9 +16,25 @@ export default new Vuex.Store({
 	},
 	mutations: {
 		makeConvertCurrency(state, payload) {
-			if(payload.length) {
+			if (payload.length) {
 				let currency = state.currencies.find(currency => currency.code === payload)
-				state.currencyValues = state.presets.map(preset => Math.round(preset*currency.rate))
+				let newCurrency = state.presets.map(preset => Math.round(preset * currency.rate))
+				let depthRound = [
+					{depth: 1, round: 1},
+					{depth: 2, round: 5},
+					{depth: 3, round: 10},
+					{depth: 4, round: 100},
+				]
+				state.currencyValues = newCurrency.map(currency => {
+					let depth = currency.toString().length
+					let obRound = depthRound.find(depthVal => depthVal.depth === depth)
+					if(obRound) {
+						currency = Math.ceil(currency / obRound.round) * obRound.round
+					} else {
+						currency = Math.ceil(currency / 1000) * 1000
+					}
+					return currency
+				})
 			}
 		}
 	},
@@ -30,7 +46,7 @@ export default new Vuex.Store({
 	getters: {
 		getPresets(state) {
 			let currVals = state.presets
-			if(state.currencyValues.length) {
+			if (state.currencyValues.length) {
 				currVals = state.currencyValues
 			}
 			return currVals
